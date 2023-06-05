@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<meta charset="UTF-8">
+<head>
+<title>Doppler Effect</title>
+<!-- Issues
+ Problem: Drawing two arcs slightly different radius per loop.
+ Cause: handleForm associated in two places.
+ Problem: Doesn't stop when I want
+ Problem: Waves aren't correct.
+ Problem: Speed of source is accelerating.
+ -->
+</head>
+<body>
+
+<!--
+ Enter speed of source,
+ press go button.
+ -->
+<form id="frm" accept-charset="utf-8" action="javascript:;">
+Choose the speed of the sound source in feet per second, then press go.
+<input type="number" name="speed", min="110" max="2200" step="110" value="110">
+<button onclick="handleForm()">Go</button>
+<br>
+1100 fps is the speed of sound.
+</form>
+<table>
+<tr>
+    <td><canvas id="central" tabindex='1' width="1100" height="550"></canvas></td>
+    </tr>
+</table>
+<p id="debug"></p>
+<p>
+Illustrating the doppler effect
+<script>
+var startTime;
+var looping=0;
+var list=[];
+// Speed of sound
+var sos=1100;
+var timeIntervalMS=100;
+// 
+var intervalSetting;
+function scale(x){
+	return x*timeIntervalMS/1000.0;
+}
+function clearScreen(){
+	var canvas = document.getElementById("central");
+	this.ctx = canvas.getContext("2d");
+	this.ctx.fillStyle = "#FFFFFF";
+	this.ctx.strokeStyle = "#FFFFFF";
+	this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
+	this.ctx.stroke();
+}
+function handleForm(){
+	list=[];
+	list.push({x:0,r:0});
+	intervalSetting=setInterval(UpdateCanvas,125);
+}
+function UpdateCanvas(){
+	var form=document.getElementById("frm");
+	var speed=form.elements[0].value;
+
+	for(let i=0;i<list.length;i++){
+		list[i].r+=scale(sos);
+	}
+	
+	list.push({x:(list[list.length-1].x) + scale(speed), r:0});
+	if(scale(list[0].x) + scale(list[0].r) > 1100){
+		clearInterval(intervalSetting);
+	}
+	clearScreen();
+	list.forEach(draw);
+}
+function arc(xc,yc,ro){
+	var canvas = document.getElementById("central");
+	this.ctx = canvas.getContext("2d");
+	this.ctx.fillStyle = "#000000";
+	this.ctx.strokeStyle = "#000000";
+	var r=ro;
+	var offset=0;
+	for(let i=0;i<r;i+=2){
+		while((r*r)+(i*i) > (ro*ro)){
+			r--;
+		}
+		this.ctx.fillRect(xc+r,yc+i,2,2);
+		this.ctx.fillRect(xc-r,yc+i,2,2);
+		this.ctx.fillRect(xc+i,yc+r,2,2);
+		this.ctx.fillRect(xc+i,yc-r,2,2);
+		if(i > 0){
+			this.ctx.fillRect(xc+r,yc-i,2,2);
+			this.ctx.fillRect(xc-r,yc-i,2,2);
+			this.ctx.fillRect(xc-i,yc+r,2,2);
+			this.ctx.fillRect(xc-i,yc-r,2,2);
+		}
+	}
+	this.ctx.stroke();
+}
+function draw(step){
+	var canvas = document.getElementById("central");
+	this.ctx = canvas.getContext("2d");
+	var yc=Math.floor(this.ctx.canvas.height/2);
+	this.ctx.fillStyle = "#000000";
+	this.ctx.strokeStyle = "#000000";
+	arc(scale(step.x),yc,scale(step.r));
+	this.ctx.fillRect(scale(step.x),yc,2,2);
+	this.ctx.stroke();
+}
+</script>
+</body>
+</html>
