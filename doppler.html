@@ -66,7 +66,9 @@ function UpdateCanvas(){
 	}
 	
 	list.push({x:(list[list.length-1].x) + scale(speed), r:0});
-	if(scale(list[0].x) + scale(list[0].r) > 1100){
+//	if((scale(list[0].x) + scale(list[0].r) > 1100) ||
+	if((scale(list[0].r) >=1100) ||
+	   (scale(list[list.length-1].x) >= 1100)){
 		clearInterval(intervalSetting);
 	}
 	clearScreen();
